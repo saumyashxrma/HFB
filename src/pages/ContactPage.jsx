@@ -5,7 +5,7 @@ const ContactPage = () => {
     <div className="container">
       <h1>Contact Us</h1>
       <p>Email: support@hindfundsbank.com</p>
-      <p>Phone: +123 456 7890</p>
+      <p>Phone: +91 6206 24 8811</p>
     </div>
   );
 };

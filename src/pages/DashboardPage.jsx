@@ -1,54 +1,46 @@
-import React, { useState, useEffect } from "react";
-import { getAccounts } from "../services/api"; // API for fetching account details
-import { Container, Row, Col, Card, Button } from "react-bootstrap";
+// src/pages/DashboardPage.jsx
+import { Card, Container, Row, Col, Button } from "react-bootstrap";
+import { useNavigate } from "react-router-dom";
 
-const DashboardPage = () => {
-  const [accounts, setAccounts] = useState([]);
-  const [transactions, setTransactions] = useState([]);
-
-  useEffect(() => {
-    getAccounts().then((response) => {
-      setAccounts(response.data);
-    });
-
-    setTransactions([
-      { id: 1, description: "Amazon Purchase", amount: -200, date: "2024-01-28" },
-      { id: 2, description: "Salary Credit", amount: 5000, date: "2024-01-27" },
-      { id: 3, description: "Electricity Bill", amount: -150, date: "2024-01-25" }
-    ]);
-  }, []);
+const DashboardPage = ({ user }) => {
+  const navigate = useNavigate();
 
   return (
-    <Container>
-      <h2 className="my-4">Dashboard</h2>
+    <Container className="py-4">
+      <h2 className="mb-4">Welcome, {user?.name}</h2>
+      
       <Row>
-        {/* Account Overview Section */}
+        {/* Account Overview */}
         <Col md={6}>
           <Card className="mb-4">
+            <Card.Header as="h5">Account Overview</Card.Header>
             <Card.Body>
-              <Card.Title>Account Overview</Card.Title>
-              {accounts.length > 0 ? (
-                accounts.map((account) => (
-                  <Card.Text key={account.id}>
-                    <strong>{account.name}</strong>: ₹{account.balance}
-                  </Card.Text>
-                ))
-              ) : (
-                <p>No accounts found.</p>
-              )}
+              {user?.accounts?.map(account => (
+                <div key={account.id} className="mb-3">
+                  <h6>{account.type} Account</h6>
+                  <p>Account Number: {account.number}</p>
+                  <p>Balance: ₹{account.balance.toLocaleString()}</p>
+                </div>
+              ))}
             </Card.Body>
           </Card>
         </Col>
-
-        {/* Recent Transactions Section */}
+        
+        {/* Recent Transactions */}
         <Col md={6}>
           <Card className="mb-4">
+            <Card.Header as="h5">Recent Transactions</Card.Header>
             <Card.Body>
-              <Card.Title>Recent Transactions</Card.Title>
-              <ul>
-                {transactions.map((txn) => (
-                  <li key={txn.id}>
-                    {txn.date} - {txn.description}: ₹{txn.amount}
+              <ul className="list-unstyled">
+                {user?.transactions?.map(txn => (
+                  <li key={txn.id} className="mb-2">
+                    <div className="d-flex justify-content-between">
+                      <span>{txn.description}</span>
+                      <span className={txn.amount < 0 ? "text-danger" : "text-success"}>
+                        {txn.amount < 0 ? "-" : "+"}₹{Math.abs(txn.amount).toLocaleString()}
+                      </span>
+                    </div>
+                    <small className="text-muted">{txn.date}</small>
                   </li>
                 ))}
               </ul>
@@ -56,20 +48,22 @@ const DashboardPage = () => {
           </Card>
         </Col>
       </Row>
-
+      
       {/* Quick Actions */}
-      <Row>
-        <Col md={12}>
-          <Card className="mb-4">
-            <Card.Body>
-              <Card.Title>Quick Actions</Card.Title>
-              <Button variant="primary" className="m-2">Transfer Funds</Button>
-              <Button variant="success" className="m-2">Pay Bills</Button>
-              <Button variant="warning" className="m-2">Download Statement</Button>
-            </Card.Body>
-          </Card>
-        </Col>
-      </Row>
+      <Card className="mb-4">
+        <Card.Header as="h5">Quick Actions</Card.Header>
+        <Card.Body>
+          <Button variant="primary" className="me-2" onClick={() => navigate("/fund-transfer")}>
+            Transfer Funds
+          </Button>
+          <Button variant="success" className="me-2" onClick={() => navigate("/manage-accounts")}>
+            Manage Accounts
+          </Button>
+          <Button variant="info" onClick={() => navigate("/personal-banking")}>
+            Personal Banking
+          </Button>
+        </Card.Body>
+      </Card>
     </Container>
   );
 };
